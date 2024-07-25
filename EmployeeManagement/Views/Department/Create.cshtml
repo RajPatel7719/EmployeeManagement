@@ -1,0 +1,41 @@
+﻿@model EmployeeManagement.BAL.DataModels.DepartmentDto
+@{
+    ViewData["Title"] = "Create Department";
+}
+
+<h1>Create Department</h1>
+
+<form id="createDepartmentForm">
+    <div>
+        <label>Name:</label>
+        <input type="text" name="Name" required />
+    </div>
+    <div>
+        <label>Is Active:</label>
+        <input type="checkbox" name="IsActive" checked />
+    </div>
+    <button type="submit">Add</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#createDepartmentForm").submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '@Url.Action("Create", "Department")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Department added successfully.');
+                        $.get('@Url.Action("Index", "Department")', function (data) {
+                            $("body").html(data);
+                        });
+                    } else {
+                        alert('Error adding department: ' + response.errors.join(', '));
+                    }
+                }
+            });
+        });
+    });
+</script>

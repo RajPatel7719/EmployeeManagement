@@ -1,0 +1,89 @@
+﻿@model IEnumerable<EmployeeManagement.BAL.DataModels.EmployeeDto>
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<h1>Employee List</h1>
+
+<div>
+    <input type="text" id="search" placeholder="Search..." value="@ViewBag.Search" />
+    <button id="searchBtn">Search</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Department Name</th>
+            <th>Salary</th>
+            <th>Join Date</th>
+            <th>Is Active</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employee in Model)
+        {
+            <tr>
+                <td>@employee.FirstName</td>
+                <td>@employee.LastName</td>
+                <td>@employee.DepartmentDto.Name</td>
+                <td>@employee.Salary.ToString("0.00")</td>
+                <td>@employee.JoinDate.ToString("dd-MM-yyyy")</td>
+                <td>@(employee.IsActive ? "True" : "False")</td>
+                <td>
+                    <button class="editBtn" data-id="@employee.EmployeeId">Edit</button>
+                    <button class="deleteBtn" data-id="@employee.EmployeeId">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <button class="prevPage" data-page="@ViewBag.CurrentPage - 1">Previous</button>
+    <button class="nextPage" data-page="@ViewBag.CurrentPage + 1">Next</button>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#searchBtn").click(function () {
+            const search = $("#search").val();
+            const page = 1;
+            loadEmployees(search, page);
+        });
+
+        $(".editBtn").click(function () {
+            const id = $(this).data("id");
+            $.get('@Url.Action("Edit", "Employee")' + id, function (data) {
+                $("body").html(data);
+            });
+        });
+
+        $(".deleteBtn").click(function () {
+            const id = $(this).data("id");
+            if (confirm('Are you sure you want to delete this employee?')) {
+                $.post('@Url.Action("Delete", "Employee")', { id: id }, function (response) {
+                    if (response.success) {
+                        alert('Employee deleted successfully.');
+                        loadEmployees($("#search").val(), @ViewBag.CurrentPage);
+                    } else {
+                        alert('Error deleting employee.');
+                    }
+                });
+            }
+        });
+
+        $(".prevPage, .nextPage").click(function () {
+            const page = $(this).data("page");
+            loadEmployees($("#search").val(), page);
+        });
+
+        function loadEmployees(search, page) {
+            $.get('@Url.Action("Index", "Employee")', { search: search, page: page }, function (data) {
+                $("body").html(data);
+            });
+        }
+    });
+</script>

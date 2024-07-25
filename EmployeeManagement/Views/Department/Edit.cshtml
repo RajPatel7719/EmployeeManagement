@@ -1,0 +1,42 @@
+﻿@model EmployeeManagement.BAL.DataModels.DepartmentDto
+@{
+    ViewData["Title"] = "Edit Department";
+}
+
+<h1>Edit Department</h1>
+
+<form id="editDepartmentForm">
+    <input type="hidden" name="DepartmentId" value="@Model.DepartmentId" />
+    <div>
+        <label>Name:</label>
+        <input type="text" name="Name" value="@Model.Name" required />
+    </div>
+    <div>
+        <label>Is Active:</label>
+        <input type="checkbox" name="IsActive" @(Model.IsActive ? "checked" : "") />
+    </div>
+    <button type="submit">Update</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#editDepartmentForm").submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '@Url.Action("Edit", "Department")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Department updated successfully.');
+                        $.get('@Url.Action("Index", "Department")', function (data) {
+                            $("body").html(data);
+                        });
+                    } else {
+                        alert('Error updating department: ' + response.errors.join(', '));
+                    }
+                }
+            });
+        });
+    });
+</script>

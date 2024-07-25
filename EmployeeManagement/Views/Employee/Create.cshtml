@@ -1,0 +1,63 @@
+﻿@model EmployeeManagement.BAL.DataModels.EmployeeDto
+
+@{
+    ViewData["Title"] = "Create Employee";
+}
+
+<h1>Create Employee</h1>
+
+<form id="createEmployeeForm">
+    <div>
+        <label>First Name:</label>
+        <input type="text" name="FirstName" required />
+    </div>
+    <div>
+        <label>Last Name:</label>
+        <input type="text" name="LastName" required />
+    </div>
+    <div>
+        <label>Department:</label>
+        <select name="DepartmentId">
+            @foreach (var department in ViewBag.Departments as List<EmployeeManagement.BAL.DataModels.DepartmentDto>)
+            {
+                <option value="@department.DepartmentId">@department.Name</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Salary:</label>
+        <input type="number" step="0.01" name="Salary" required />
+    </div>
+    <div>
+        <label>Join Date:</label>
+        <input type="date" name="JoinDate" required />
+    </div>
+    <div>
+        <label>Is Active:</label>
+        <input type="checkbox" name="IsActive" checked />
+    </div>
+    <button type="submit">Add</button>
+</form>
+
+<script>
+    $(document).ready(function () {
+        $("#createEmployeeForm").submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '@Url.Action("Create", "Employee")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Employee added successfully.');
+                        $.get('@Url.Action("Index", "Employee")', function (data) {
+                            $("body").html(data);
+                        });
+                    } else {
+                        alert('Error adding employee: ' + response.errors.join(', '));
+                    }
+                }
+            });
+        });
+    });
+</script>

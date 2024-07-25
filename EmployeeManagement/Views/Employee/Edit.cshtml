@@ -1,0 +1,72 @@
+﻿@model EmployeeManagement.BAL.DataModels.EmployeeDto
+@{
+    ViewBag.Title = "Edit Employee";
+}
+
+<h1>Edit Employee</h1>
+
+<form  id="editEmployeeForm">
+    <input type="hidden" asp-for="EmployeeId" />
+    <div>
+        <label>First Name:</label>
+        <input asp-for="FirstName" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Last Name:</label>
+        <input asp-for="LastName" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Department:</label>
+        <select asp-for="DepartmentId">
+            @foreach (var department in ViewBag.Departments as List<EmployeeManagement.BAL.DataModels.DepartmentDto>)
+            {
+                var selected = department.DepartmentId == Model.DepartmentId ? "selected" : "";
+                <option value="@department.DepartmentId" selected>@department.Name</option>
+            }
+        </select>
+    </div>
+    <div>
+        <label>Salary:</label>
+        <input asp-for="Salary" />
+        <span asp-validation-for="Salary" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Join Date:</label>
+        <input asp-for="JoinDate" type="date" />
+        <span asp-validation-for="JoinDate" class="text-danger"></span>
+    </div>
+    <div>
+        <label>IsActive:</label>
+        <input asp-for="IsActive" type="checkbox" />
+    </div>
+    <button type="submit">Update</button>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#editEmployeeForm").submit(function (event) {
+            event.preventDefault();
+            $.ajax({
+                url: '@Url.Action("Edit", "Employee")',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function (response) {
+                    if (response.success) {
+                        alert('Employee updated successfully.');
+                        $.get('@Url.Action("Index", "Employee")', function (data) {
+                            $("body").html(data);
+                        });
+                    } else {
+                        alert('Error updating employee: ' + response.errors.join(', '));
+                    }
+                }
+            });
+        });
+    });
+</script>
